@@ -1,10 +1,14 @@
 # Attentive Feedback Network for Boundary-Aware Salient Object Detection
 
-![](https://cdn.nlark.com/yuque/0/2019/png/192314/1562766838152-5f93cf22-3982-4494-9666-4ded33631ea3.png)
+![](https://user-images.githubusercontent.com/26847524/74926389-c9331700-5410-11ea-92e1-77823d678c26.png)
+
+## 整体结构
+
+![](https://user-images.githubusercontent.com/26847524/74926418-d2bc7f00-5410-11ea-863c-ccd3d1c4ad92.png)
 
 ## 复现模块
 
-![](https://cdn.nlark.com/yuque/0/2019/png/192314/1562766887660-7e4aed77-42ae-43b1-af71-3279658b60e7.png)
+![](https://user-images.githubusercontent.com/26847524/74926455-dcde7d80-5410-11ea-9fa8-b07e65356031.png)
 
 ## 相关链接
 
