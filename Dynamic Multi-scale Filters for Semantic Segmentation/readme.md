@@ -9,4 +9,4 @@
 ## 相关链接
 
 * 论文: http://openaccess.thecvf.com/content_ICCV_2019/papers/He_Dynamic_Multi-Scale_Filters_for_Semantic_Segmentation_ICCV_2019_paper.pdf
-* 代码: 尚未找到
+* 代码: 未找到完整代码, 个人实现了其中的关键模块`DCM`, 见本文件夹下`DCM.py`文件
