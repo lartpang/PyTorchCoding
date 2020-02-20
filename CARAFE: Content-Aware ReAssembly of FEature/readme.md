@@ -13,5 +13,5 @@
 ## 相关链接
 
 * [1]: CARAFE: 轻量级通用上采样算子 - 陈恺的文章 - 知乎：https://zhuanlan.zhihu.com/p/76063768
-* [2]: 动态滤波器卷在CV中的应用 - Happy的文章 - 知乎：https://zhuanlan.zhihu.com/p/76392920
+* [2]: 动态滤波器介绍链接汇总 - Happy的文章 - 知乎: https://zhuanlan.zhihu.com/p/100470879
 * [3]: 论文: https://arxiv.org/pdf/1905.02188.pdf
