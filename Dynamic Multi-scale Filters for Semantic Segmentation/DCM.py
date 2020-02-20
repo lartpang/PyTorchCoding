@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+# @Time    : 2020-2-20 18:49:41
+# @Author  : Lart Pang
+# @FileName: DCM.py
+# @Project : PyTorchCoding
+# @GitHub  : https://github.com/lartpang
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
