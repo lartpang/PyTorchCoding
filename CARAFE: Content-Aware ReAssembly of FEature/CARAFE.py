@@ -2,7 +2,7 @@
 # @Time    : 2019/8/2 下午3:23
 # @Author  : Lart Pang
 # @FileName: CARAFE.py
-# @Project : Paper_Code
+# @Project : PyTorchCoding
 # @GitHub  : https://github.com/lartpang
 
 import torch
