@@ -56,8 +56,9 @@ class Trainer():
         if not self.args['use_backbone']:
             self.net = self.args[self.args["NET"]]["net"]().to(self.dev)
         else:
-            self.net = self.args[self.args["NET"]]["net"](
-                self.args[self.args["backbone"]]).to(self.dev)
+            self.net = self.args[self.args["NET"]]["net"](self.args[self.args["backbone"]]).to(
+                self.dev
+            )
         # 输出并记录模型运算量和参数量
         # model_msg = get_FLOPs_Params(self.net, self.args["input_size"], mode="print&return")
         # make_log(self.path["val_log"], f"=== model info ==={self.net}"
@@ -128,11 +129,13 @@ class Trainer():
 
                 # 记录每一次迭代的数据
                 if (self.args["print_freq"] > 0 and (curr_iter + 1) % self.args["print_freq"] == 0):
-                    log = (f"[I:{curr_iter}/{self.iter_num}][E:{curr_epoch}:{self.end_epoch}]>"
-                           f"[{self.args[self.args['NET']]['exp_name']}]"
-                           f"[Lr:{self.opti.param_groups[0]['lr']:.7f}]"
-                           f"[Avg:{train_loss_record.avg:.5f}|Cur:{train_iter_loss:.5f}|"
-                           f"{loss_item_list}]")
+                    log = (
+                        f"[I:{curr_iter}/{self.iter_num}][E:{curr_epoch}:{self.end_epoch}]>"
+                        f"[{self.args[self.args['NET']]['exp_name']}]"
+                        f"[Lr:{self.opti.param_groups[0]['lr']:.7f}]"
+                        f"[Avg:{train_loss_record.avg:.5f}|Cur:{train_iter_loss:.5f}|"
+                        f"{loss_item_list}]"
+                    )
                     print(log)
                     make_log(self.path["tr_log"], log)
 
@@ -153,11 +156,13 @@ class Trainer():
                 self.pth_path = self.path["final_net"]
                 if self.args["test_as_val"]:
                     # 使用测试集来验证
-                    results = self.test(mode="test", save_pre=False,
-                                        data_path=self.args['te_data_path'])
+                    results = self.test(
+                        mode="test", save_pre=False, data_path=self.args['te_data_path']
+                    )
                 else:
-                    results = self.test(mode="val", save_pre=False,
-                                        data_path=self.args['val_data_path'])
+                    results = self.test(
+                        mode="val", save_pre=False, data_path=self.args['val_data_path']
+                    )
                 if results["maxf"] > self.best_results["maxf"]:
                     self.best_results = results
                     torch.save(self.net.state_dict(), self.path["best_net"])
@@ -183,13 +188,14 @@ class Trainer():
             else:
                 prefix = self.args['prefix']
             print(f" ==>> 使用测试集{data_name}测试 <<== ")
-            self.te_loader = DataLoaderX(ImageFolder(data_path,
-                                                     mode="test",
-                                                     in_size=self.args["input_size"],
-                                                     prefix=prefix),
-                                         batch_size=self.args["batch_size"],
-                                         num_workers=self.args["num_workers"],
-                                         shuffle=False, drop_last=False, pin_memory=True)
+            self.te_loader = DataLoaderX(
+                ImageFolder(data_path, mode="test", in_size=self.args["input_size"], prefix=prefix),
+                batch_size=self.args["batch_size"],
+                num_workers=self.args["num_workers"],
+                shuffle=False,
+                drop_last=False,
+                pin_memory=True
+            )
             results = self.test(mode="test", save_pre=False, data_path=data_path)
             msg = (f" ==>> 在{data_name}:'{data_path}'测试集上结果：{results} <<== ")
             print(msg)
@@ -219,8 +225,10 @@ class Trainer():
         maes = AvgMeter()
         tqdm_iter = tqdm(enumerate(loader), total=len(loader), leave=False)
         for test_batch_id, test_data in tqdm_iter:
-            tqdm_iter.set_description(f"{self.args[self.args['NET']]['exp_name']}:"
-                                      f"te=>{test_batch_id + 1}")
+            tqdm_iter.set_description(
+                f"{self.args[self.args['NET']]['exp_name']}:"
+                f"te=>{test_batch_id + 1}"
+            )
             in_imgs, in_names = test_data
             in_imgs = in_imgs.to(self.dev)
             with torch.no_grad():
@@ -255,52 +263,70 @@ class Trainer():
             lamb = lambda curr: pow((1 - float(curr) / total_num), self.args["lr_decay"])
             scheduler = lr_scheduler.LambdaLR(self.opti, lr_lambda=lamb)
         elif self.args["lr_type"] == "cos":
-            scheduler = lr_scheduler.CosineAnnealingLR(self.opti, T_max=total_num - 1,
-                                                       eta_min=4e-08)
+            scheduler = lr_scheduler.CosineAnnealingLR(
+                self.opti, T_max=total_num - 1, eta_min=4e-08
+            )
         elif self.args["lr_type"] == "step":
-            scheduler = lr_scheduler.StepLR(self.opti, step_size=self.args['steplr_epoch'],
-                                            gamma=self.args['steplr_gamma'])
+            scheduler = lr_scheduler.StepLR(
+                self.opti, step_size=self.args['steplr_epoch'], gamma=self.args['steplr_gamma']
+            )
         else:
             raise NotImplementedError
         return scheduler
 
     def make_loader(self):
         print(f" ==>> 使用训练集{self.args['tr_data_path']}训练 <<== ")
-        train_pipe = ImagePipeline(imageset_dir=self.args['tr_data_path'],
-                                   image_size=self.args["input_size"],
-                                   random_shuffle=True,
-                                   batch_size=self.args["batch_size"])
-        train_loader = DALIGenericIterator(pipelines=train_pipe,
-                                           output_map=["images", "masks"],
-                                           size=train_pipe.epoch_size(),
-                                           auto_reset=True,
-                                           fill_last_batch=False,
-                                           last_batch_padded=False)
+        train_pipe = ImagePipeline(
+            imageset_dir=self.args['tr_data_path'],
+            image_size=self.args["input_size"],
+            random_shuffle=True,
+            batch_size=self.args["batch_size"]
+        )
+        train_loader = DALIGenericIterator(
+            pipelines=train_pipe,
+            output_map=["images", "masks"],
+            size=train_pipe.epoch_size(),
+            auto_reset=True,
+            fill_last_batch=False,
+            last_batch_padded=False
+        )
 
         if self.args['val_data_path'] != None:
             print(f" ==>> 使用验证集{self.args['val_data_path']}验证 <<== ")
-            val_set = ImageFolder(self.args['val_data_path'],
-                                  mode="test",
-                                  in_size=self.args["input_size"],
-                                  prefix=self.args['prefix'])
-            val_loader = DataLoaderX(val_set,
-                                     batch_size=self.args["batch_size"],
-                                     num_workers=self.args["num_workers"],
-                                     shuffle=False, drop_last=False, pin_memory=True)
+            val_set = ImageFolder(
+                self.args['val_data_path'],
+                mode="test",
+                in_size=self.args["input_size"],
+                prefix=self.args['prefix']
+            )
+            val_loader = DataLoaderX(
+                val_set,
+                batch_size=self.args["batch_size"],
+                num_workers=self.args["num_workers"],
+                shuffle=False,
+                drop_last=False,
+                pin_memory=True
+            )
         else:
             print(" ==>> 不使用验证集验证 <<== ")
             val_loader = None
 
         if self.args['te_data_path'] != None:
             print(f" ==>> 使用测试集{self.args['te_data_path']}测试 <<== ")
-            test_set = ImageFolder(self.args['te_data_path'],
-                                   mode="test",
-                                   in_size=self.args["input_size"],
-                                   prefix=self.args['prefix'])
-            test_loader = DataLoaderX(test_set,
-                                      batch_size=self.args["batch_size"],
-                                      num_workers=self.args["num_workers"],
-                                      shuffle=False, drop_last=False, pin_memory=True)
+            test_set = ImageFolder(
+                self.args['te_data_path'],
+                mode="test",
+                in_size=self.args["input_size"],
+                prefix=self.args['prefix']
+            )
+            test_loader = DataLoaderX(
+                test_set,
+                batch_size=self.args["batch_size"],
+                num_workers=self.args["num_workers"],
+                shuffle=False,
+                drop_last=False,
+                pin_memory=True
+            )
         else:
             print(f" ==>> 不使用测试集测试 <<== ")
             test_loader = None
@@ -311,49 +337,62 @@ class Trainer():
             # https://github.com/implus/PytorchInsight/blob/master/classification/imagenet_tricks.py
             params = [
                 {
-                    "params": [p for name, p in self.net.named_parameters()
-                               if ("bias" in name or "bn" in name)],
-                    "weight_decay": 0,
+                    "params": [
+                        p for name, p in self.net.named_parameters()
+                        if ("bias" in name or "bn" in name)
+                    ],
+                    "weight_decay":
+                    0,
                 },
                 {
-                    "params": [p for name, p in self.net.named_parameters()
-                               if ("bias" not in name and "bn" not in name)]
+                    "params": [
+                        p for name, p in self.net.named_parameters()
+                        if ("bias" not in name and "bn" not in name)
+                    ]
                 },
             ]
-            optimizer = SGD(params,
-                            lr=self.args["lr"],
-                            momentum=self.args["momentum"],
-                            weight_decay=self.args["weight_decay"])
+            optimizer = SGD(
+                params,
+                lr=self.args["lr"],
+                momentum=self.args["momentum"],
+                weight_decay=self.args["weight_decay"]
+            )
         elif self.args["optim"] == "sgd_r3":
             params = [
                 # 不对bias参数执行weight decay操作，weight decay主要的作用就是通过对网络
                 # 层的参数（包括weight和bias）做约束（L2正则化会使得网络层的参数更加平滑）达
                 # 到减少模型过拟合的效果。
                 {
-                    "params": [param for name, param in self.net.named_parameters()
-                               if name[-4:] == "bias"],
-                    "lr": 2 * self.args["lr"],
+                    "params":
+                    [param for name, param in self.net.named_parameters() if name[-4:] == "bias"],
+                    "lr":
+                    2 * self.args["lr"],
                 },
                 {
-                    "params": [param for name, param in self.net.named_parameters()
-                               if name[-4:] != "bias"],
-                    "lr": self.args["lr"],
-                    "weight_decay": self.args["weight_decay"],
+                    "params":
+                    [param for name, param in self.net.named_parameters() if name[-4:] != "bias"],
+                    "lr":
+                    self.args["lr"],
+                    "weight_decay":
+                    self.args["weight_decay"],
                 },
             ]
-            optimizer = SGD(params,
-                            momentum=self.args["momentum"])
+            optimizer = SGD(params, momentum=self.args["momentum"])
         elif self.args["optim"] == "sgd_all":
-            optimizer = SGD(self.net.parameters(),
-                            lr=self.args["lr"],
-                            weight_decay=self.args["weight_decay"],
-                            momentum=self.args["momentum"])
+            optimizer = SGD(
+                self.net.parameters(),
+                lr=self.args["lr"],
+                weight_decay=self.args["weight_decay"],
+                momentum=self.args["momentum"]
+            )
         elif self.args["optim"] == "adam":
-            optimizer = Adam(self.net.parameters(),
-                             lr=self.args["lr"],
-                             betas=(0.9, 0.999),
-                             eps=1e-8,
-                             weight_decay=self.args["weight_decay"])
+            optimizer = Adam(
+                self.net.parameters(),
+                lr=self.args["lr"],
+                betas=(0.9, 0.999),
+                eps=1e-8,
+                weight_decay=self.args["weight_decay"]
+            )
         else:
             raise NotImplementedError
         print("optimizer = ", optimizer)

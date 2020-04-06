@@ -16,8 +16,10 @@ class CARAFE(nn.Module):
         self.kernel_size = kernel_size
         self.up_factor = up_factor
         self.down = nn.Conv2d(inC, inC // 4, 1)
-        self.encoder = nn.Conv2d(inC // 4, self.up_factor ** 2 * self.kernel_size ** 2,
-                                 self.kernel_size, 1, self.kernel_size // 2)
+        self.encoder = nn.Conv2d(
+            inC // 4, self.up_factor**2 * self.kernel_size**2, self.kernel_size, 1,
+            self.kernel_size // 2
+        )
         self.out = nn.Conv2d(inC, outC, 1)
 
     def forward(self, in_tensor):
@@ -31,14 +33,20 @@ class CARAFE(nn.Module):
         kernel_tensor = F.softmax(kernel_tensor, dim=1)  # N, Kup^2, S*H, S*W
         kernel_tensor = kernel_tensor.unfold(2, self.up_factor, step=self.up_factor)
         kernel_tensor = kernel_tensor.unfold(3, self.up_factor, step=self.up_factor)
-        kernel_tensor = kernel_tensor.reshape(N, self.kernel_size ** 2, H, W, self.up_factor ** 2)
+        kernel_tensor = kernel_tensor.reshape(N, self.kernel_size**2, H, W, self.up_factor**2)
         kernel_tensor = kernel_tensor.permute(0, 2, 3, 1, 4)  # N, H, W, Kup^2, S^2
 
         # content-aware reassembly module
         # tensor.unfold: dim, size, step
-        in_tensor = F.pad(in_tensor, pad=(self.kernel_size // 2, self.kernel_size // 2,
-                                          self.kernel_size // 2, self.kernel_size // 2),
-                          mode='constant', value=0)
+        in_tensor = F.pad(
+            in_tensor,
+            pad=(
+                self.kernel_size // 2, self.kernel_size // 2, self.kernel_size // 2,
+                self.kernel_size // 2
+            ),
+            mode='constant',
+            value=0
+        )
         in_tensor = in_tensor.unfold(2, self.kernel_size, step=1)
         in_tensor = in_tensor.unfold(3, self.kernel_size, step=1)
         in_tensor = in_tensor.reshape(N, C, H, W, -1)

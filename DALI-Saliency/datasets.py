@@ -47,14 +47,16 @@ class ExternalInputIterator(object):
 
 
 class ImagePipeline(Pipeline):
-    def __init__(self, imageset_dir, image_size, random_shuffle, batch_size=4, num_threads=2, device_id=0):
+    def __init__(
+        self, imageset_dir, image_size, random_shuffle, batch_size=4, num_threads=2, device_id=0
+    ):
         super(ImagePipeline, self).__init__(batch_size, num_threads, device_id, seed=12)
         self.imageset_dir = imageset_dir
         self.random_shuffle = random_shuffle
 
-        eii = ExternalInputIterator(root=self.imageset_dir,
-                                    batch_size=self.batch_size,
-                                    random_shuffle=self.random_shuffle)
+        eii = ExternalInputIterator(
+            root=self.imageset_dir, batch_size=self.batch_size, random_shuffle=self.random_shuffle
+        )
         self.iterator = iter(eii)
         self.num_inputs = len(self.iterator.files)
 
@@ -69,25 +71,29 @@ class ImagePipeline(Pipeline):
         self.flip = ops.Flip(device="gpu", horizontal=1, vertical=0)
 
         rotate_degree = random.random() * 2 * 10 - 10
-        self.rotate_image = ops.Rotate(device="gpu",
-                                       angle=rotate_degree,
-                                       interp_type=types.DALIInterpType.INTERP_LINEAR)
-        self.rotate_mask = ops.Rotate(device="gpu",
-                                      angle=rotate_degree,
-                                      interp_type=types.DALIInterpType.INTERP_NN)
+        self.rotate_image = ops.Rotate(
+            device="gpu", angle=rotate_degree, interp_type=types.DALIInterpType.INTERP_LINEAR
+        )
+        self.rotate_mask = ops.Rotate(
+            device="gpu", angle=rotate_degree, interp_type=types.DALIInterpType.INTERP_NN
+        )
 
-        self.cmnp_image = ops.CropMirrorNormalize(device="gpu",
-                                                  output_dtype=types.FLOAT,
-                                                  output_layout=types.NCHW,
-                                                  image_type=types.RGB,
-                                                  mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
-                                                  std=[0.229 * 255, 0.224 * 255, 0.225 * 255])
-        self.cmnp_mask = ops.CropMirrorNormalize(device="gpu",
-                                                 output_dtype=types.FLOAT,
-                                                 output_layout=types.NCHW,
-                                                 image_type=types.GRAY,
-                                                  mean=[0],
-                                                  std=[255])
+        self.cmnp_image = ops.CropMirrorNormalize(
+            device="gpu",
+            output_dtype=types.FLOAT,
+            output_layout=types.NCHW,
+            image_type=types.RGB,
+            mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
+            std=[0.229 * 255, 0.224 * 255, 0.225 * 255]
+        )
+        self.cmnp_mask = ops.CropMirrorNormalize(
+            device="gpu",
+            output_dtype=types.FLOAT,
+            output_layout=types.NCHW,
+            image_type=types.GRAY,
+            mean=[0],
+            std=[255]
+        )
 
     # epoch_size = number of (image, mask) image pairs in the dataset
     def epoch_size(self, name=None):
@@ -121,9 +127,13 @@ class ImagePipeline(Pipeline):
             self.feed_input(self.images, images)
             self.feed_input(self.masks, masks)
         except StopIteration:
-            self.iterator = iter(ExternalInputIterator(root=self.imageset_dir,
-                                                       batch_size=self.batch_size,
-                                                       random_shuffle=self.random_shuffle))
+            self.iterator = iter(
+                ExternalInputIterator(
+                    root=self.imageset_dir,
+                    batch_size=self.batch_size,
+                    random_shuffle=self.random_shuffle
+                )
+            )
             raise StopIteration
 
 
@@ -132,18 +142,22 @@ if __name__ == '__main__':
     gpu_id = 0
     batch_size = 5
 
-    train_pipe = ImagePipeline(imageset_dir='/home/erti/Datasets/RGBSaliency/DUTS/Train',
-                               image_size=128,
-                               random_shuffle=False,
-                               batch_size=batch_size)
+    train_pipe = ImagePipeline(
+        imageset_dir='/home/erti/Datasets/RGBSaliency/DUTS/Train',
+        image_size=128,
+        random_shuffle=False,
+        batch_size=batch_size
+    )
     m_train = train_pipe.epoch_size()
     print("Size of the training set: ", m_train)
-    train_pipe_loader = DALIGenericIterator(pipelines=train_pipe,
-                                            output_map=["images", "masks"],
-                                            size=m_train,
-                                            auto_reset=True,
-                                            fill_last_batch=False,
-                                            last_batch_padded=True)
+    train_pipe_loader = DALIGenericIterator(
+        pipelines=train_pipe,
+        output_map=["images", "masks"],
+        size=m_train,
+        auto_reset=True,
+        fill_last_batch=False,
+        last_batch_padded=True
+    )
     # 只有batchsize可以整除整个数据集的长度的时候，才能触发shuffle
     for j in range(5):
         print(train_pipe.iterator.files)
