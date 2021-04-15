@@ -40,9 +40,7 @@ class MHConvAttention(nn.Module):
 
     def forward(self, src):
         """
-        :param query: B,C,H,W
-        :param key: B,C,H,W
-        :param value: B,C,H,W
+        :param src: B,C,H,W
         :return: B,C,H,W
         """
         _, C, H, W = src.shape
