@@ -33,8 +33,8 @@ class MHConvAttention(nn.Module):
 
         self.qkv_conv = nn.Conv2d(embedding_dim, 3 * embedding_dim, 1, bias=False)
 
-        # Conditional Positional Encodings for Vision Transformers
-        self.cpe = nn.Conv2d(embedding_dim, embedding_dim, 3, 1, 1, bias=False)
+        # Depthwise Convolution based Conditional Positional Encodings for Vision Transformers
+        self.cpe = nn.Conv2d(embedding_dim, embedding_dim, 3, 1, 1, bias=False, groups=embedding_dim)
 
         self.out = nn.Conv2d(embedding_dim, embedding_dim, 1, bias=False)
 
