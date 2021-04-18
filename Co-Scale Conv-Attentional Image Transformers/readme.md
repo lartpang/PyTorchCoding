@@ -1,7 +1,12 @@
 ## Co-Scale Conv-Attentional Image Transformers
 
+### Note
+
+If you have a better implementation or find a bug, please let me know 😆 , thanks!
+
 ### Change Log
 
+- 2021-04-18 Change the method `tensor.unflatten()` to `einops.rearrange()` for avoiding some problems.
 - 2021-04-15 Create the initial version of Conv-Attention.
 - 2021-04-16 Modify the `Conditional Positional Encodings for Vision Transformers` to depthwise convolution.
 
