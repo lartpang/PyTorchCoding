@@ -60,7 +60,9 @@ class MHConvAttention(nn.Module):
         # Factorized Attention
         content_lambda = torch.einsum("bin, bon -> bio", k.flatten(-2).softmax(-1), v.flatten(-2))
         content_output = torch.einsum("bin, bio -> bon", q.flatten(-2) * scaling_factor, content_lambda)
-        content_output = content_output.unflatten(dim=-1, sizes=(H, W))
+        # content_output = content_output.unflatten(dim=-1, sizes=(H, W))
+        content_output = rearrange(content_output, "bnh hd (h w) -> bnh hd h w", h=H)
+
 
         # Convolutional Relative Position Encoding
         position_lambda = F.conv2d(
