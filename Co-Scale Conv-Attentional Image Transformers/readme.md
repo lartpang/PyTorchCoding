@@ -4,6 +4,10 @@
 
 If you have a better implementation or find a bug, please let me know 😆 , thanks!
 
+- 2021-04-23 The author release the code of CoaT. Official code is preferred. <https://github.com/mlpc-ucsd/CoaT/blob/main/src/models/coat.py>. In my implementation, some details are different with the author's. For example:
+  - I did not introduce the CLS token for the classification task, which would cause the difference in the specific calculation forms of the attention and the convolutional relative position encoding. 
+  - I have only implemented the form in which all the attention heads have the same window size.
+
 ### Change Log
 
 - 2021-04-18 Change the method `tensor.unflatten()` to `einops.rearrange()` for avoiding some problems.
